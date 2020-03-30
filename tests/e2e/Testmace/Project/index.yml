@@ -1,0 +1,22 @@
+projectUId: 33694810-72bb-11ea-8556-a5df9cc8d2d0
+type: Project
+name: Project
+environments:
+  environments:
+    localEnv:
+      baseURL: 'http://localhost:8080'
+children:
+  - DeleteFile
+  - DownloadFile
+  - UploadFile
+variables: {}
+authData:
+  type: inherit
+settings:
+  proxy:
+    enable: false
+requestData:
+  headers: []
+  disabledInheritedHeaders: []
+  strictSSL: 'No'
+cookies: []

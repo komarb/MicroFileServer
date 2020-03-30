@@ -1,0 +1,23 @@
+children: []
+variables: {}
+type: RequestStep
+assignVariables: []
+requestData:
+  request:
+    method: DELETE
+    url: '${$env.baseURL}/files/5e824b6dd3468776ad95b04d'
+  headers: []
+  disabledInheritedHeaders: []
+  params: []
+  body:
+    type: Json
+    jsonBody: ''
+    xmlBody: ''
+    textBody: ''
+    formData: []
+    file: ''
+    formURLEncoded: []
+  strictSSL: Inherit
+authData:
+  type: inherit
+name: DeleteFile

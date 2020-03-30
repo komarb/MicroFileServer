@@ -17,6 +17,7 @@ type App struct {
 }
 
 var collection *mongo.Collection
+var db *mongo.Database
 var cfg *config.Config
 
 func (a *App) Init(config *config.Config) {
@@ -61,13 +62,20 @@ func (a *App) Init(config *config.Config) {
 	log.WithField("testMode", cfg.App.TestMode).Info("Let's check if test mode is on...")
 
 	collection = client.Database(cfg.DB.DBName).Collection(cfg.DB.CollectionName)
-
+	db = client.Database(cfg.DB.DBName)
 	a.Router = mux.NewRouter()
 	a.setRouters()
 }
 
 func (a *App) setRouters() {
-
+	/*if cfg.App.TestMode {
+		a.Router.Use(testAuthMiddleware)
+	} else {
+		a.Router.Use(authMiddleware)
+	}*/
+	a.Router.HandleFunc("/files/{id}", downloadFile).Methods("GET")
+	a.Router.HandleFunc("/upload", uploadFile).Methods("POST")
+	a.Router.HandleFunc("/files/{id}", deleteFile).Methods("DELETE")
 }
 
 func (a *App) Run(addr string) {
@@ -88,3 +96,4 @@ func init() {
 		FullTimestamp: true,
 	})
 }
+
