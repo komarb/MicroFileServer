@@ -1,0 +1,12 @@
+{
+  "DbOptions": {
+    "host": "localhost",
+    "dbPort": "27017",
+    "dbName" : "MyFileServer",
+    "collectionName" : "files"
+  },
+  "AppOptions": {
+    "appPort": "8080",
+    "testMode": false
+  }
+}
