@@ -19,7 +19,7 @@ import (
 
 
 func downloadFile(w http.ResponseWriter, r *http.Request) {
-	var downloadedFile	models.File
+	var downloadedFile models.File
 	var buf bytes.Buffer
 	data := mux.Vars(r)
 
@@ -94,7 +94,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 
 
 func deleteFile(w http.ResponseWriter, r *http.Request) {
-	var requiredFile	models.File
+	var requiredFile models.File
 	data := mux.Vars(r)
 
 	objID, err := primitive.ObjectIDFromHex(string(data["id"]))

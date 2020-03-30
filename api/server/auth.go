@@ -49,7 +49,7 @@ func authMiddleware(next http.Handler) http.Handler {
 		if !checkScope(cfg.Auth.Scope, claims) {
 			log.WithFields(log.Fields{
 				"requiredScope" : cfg.Auth.Scope,
-				"error" : err,
+				"error" :         err,
 			}).Warning("Invalid scope!")
 
 			w.WriteHeader(http.StatusUnauthorized)
