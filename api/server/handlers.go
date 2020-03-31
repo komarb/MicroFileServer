@@ -4,12 +4,14 @@ import (
 	"MicroFileServer/models"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -65,29 +67,37 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	defer data.Close()
-	filyBytes, err := ioutil.ReadAll(data)
+	fileBytes, err := ioutil.ReadAll(data)
 	if err != nil {
 		log.Fatal(err)
 	}
+	/*subClaim, err := getClaim(r, "sub")
+	if err != nil {
+		logging.AuthError(w, err, "getClaim (sub)")
+		return
+	}*/
+	subClaim := "Grisha"
+	desc := r.FormValue("fileDescription")
+
+	gridFSOptions := options.GridFSUpload()
+	gridFSOptions.SetMetadata(bson.M{"fileSender" : subClaim, "fileDescription" : desc})
 	bucket, err := gridfs.NewBucket(db)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	uploadStream, err := bucket.OpenUploadStream(handler.Filename)
+	uploadStream, err := bucket.OpenUploadStream(handler.Filename, gridFSOptions)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	defer uploadStream.Close()
 
-	fileSize, err := uploadStream.Write(filyBytes)
+	fileSize, err := uploadStream.Write(fileBytes)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Info("Write file to DB was successful. File size: %d M\n", fileSize)
+	log.Infof("Write file to DB was successful. File size: %dM\n", fileSize)
 	w.Write([]byte("Successfully uploaded file!"))
 }
 
@@ -126,4 +136,68 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(200)
 	w.Write([]byte("Successfully deleted file!"))
+}
+
+func getFilesList(w http.ResponseWriter, r *http.Request) {
+	files := make([]models.File, 0)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	cur, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		log.WithFields(log.Fields{
+			"function" : "mongo.Find",
+			"handler" : "getFilesList",
+			"error"	:	err,
+		},
+		).Fatal("DB interaction resulted in error, shutting down...")
+	}
+	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cur.Close(ctx)
+	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	err = cur.All(ctx, &files)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"function" : "mongo.All",
+			"handler" : "getFilesList",
+			"error"	:	err,
+		},
+		).Fatal("DB interaction resulted in error, shutting down...")
+	}
+	json.NewEncoder(w).Encode(files)
+}
+
+func getFilesListForUser(w http.ResponseWriter, r *http.Request) {
+	files := make([]models.File, 0)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	data := mux.Vars(r)
+	user := data["user"]
+
+	filter := bson.M{
+		"metadata.fileSender" : user,
+	}
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"function" : "mongo.Find",
+			"handler" : "getFilesList",
+			"error"	:	err,
+		},
+		).Fatal("DB interaction resulted in error, shutting down...")
+	}
+	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cur.Close(ctx)
+	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	err = cur.All(ctx, &files)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"function" : "mongo.All",
+			"handler" : "getFilesList",
+			"error"	:	err,
+		},
+		).Fatal("DB interaction resulted in error, shutting down...")
+	}
+	json.NewEncoder(w).Encode(files)
 }

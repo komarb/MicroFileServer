@@ -9,6 +9,8 @@ children:
   - DeleteFile
   - DownloadFile
   - UploadFile
+  - GetFilesList
+  - GetFilesListForUser
 variables: {}
 authData:
   type: inherit

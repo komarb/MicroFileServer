@@ -73,9 +73,12 @@ func (a *App) setRouters() {
 	} else {
 		a.Router.Use(authMiddleware)
 	}*/
-	a.Router.HandleFunc("/files/{id}", downloadFile).Methods("GET")
+	a.Router.HandleFunc("/download/{id}", downloadFile).Methods("GET")
 	a.Router.HandleFunc("/upload", uploadFile).Methods("POST")
 	a.Router.HandleFunc("/files/{id}", deleteFile).Methods("DELETE")
+	a.Router.HandleFunc("/files", getFilesListForUser).Methods("GET").Queries("user","{user}")
+	a.Router.HandleFunc("/files", getFilesList).Methods("GET")
+
 }
 
 func (a *App) Run(addr string) {
