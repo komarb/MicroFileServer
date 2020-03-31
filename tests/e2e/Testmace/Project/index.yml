@@ -5,12 +5,14 @@ environments:
   environments:
     localEnv:
       baseURL: 'http://localhost:8080'
+      testJWT: >-
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEyMyJ9.eyJhdWQiOiJpdGxhYiIsImlzcyI6Imh0dHBzOi8vZGV2LmlkZW50aXR5LnJ0dWl0bGFiLnJ1IiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MDU0Njc3NTY4NjksInN1YiI6IjMyMS1sb2wtMzIxIiwicm9sZSI6InVzZXIiLCJzY29wZSI6WyJyb2xlcyIsIm9wZW5pZCIsInByb2ZpbGUiLCJpdGxhYi5ldmVudHMiLCJpdGxhYi5yZXBvcnRzIl19.aRyxv96apYbGnyMtbACKdizTFPBmyCG2PpwActLyKJk
 children:
-  - DeleteFile
-  - DownloadFile
   - UploadFile
-  - GetFilesList
   - GetFilesListForUser
+  - GetFilesList
+  - DownloadFile
+  - DeleteFile
 variables: {}
 authData:
   type: inherit
@@ -18,7 +20,10 @@ settings:
   proxy:
     enable: false
 requestData:
-  headers: []
+  headers:
+    - isChecked: true
+      name: Authorization
+      value: 'Bearer ${$env.testJWT}'
   disabledInheritedHeaders: []
   strictSSL: 'No'
 cookies: []

@@ -5,10 +5,13 @@ assignVariables: []
 requestData:
   request:
     method: GET
-    url: '${$env.baseURL}/files/userid'
+    url: '${$env.baseURL}/files?user=Anton'
   headers: []
   disabledInheritedHeaders: []
-  params: []
+  params:
+    - name: user
+      value: Anton
+      isChecked: true
   body:
     type: Json
     jsonBody: ''

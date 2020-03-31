@@ -1,4 +1,5 @@
-children: []
+children:
+  - Assertions
 variables: {}
 type: RequestStep
 assignVariables: []

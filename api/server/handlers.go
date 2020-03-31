@@ -1,6 +1,7 @@
 package server
 
 import (
+	"MicroFileServer/logging"
 	"MicroFileServer/models"
 	"bytes"
 	"context"
@@ -23,7 +24,18 @@ import (
 func downloadFile(w http.ResponseWriter, r *http.Request) {
 	var downloadedFile models.File
 	var buf bytes.Buffer
+
+	subClaim, err := getClaim(r, "sub")
+	if err != nil {
+		logging.AuthError(w, err, "getClaim(sub)")
+		return
+	}
 	data := mux.Vars(r)
+
+	if subClaim != data["id"] {
+		w.WriteHeader(403)
+		return
+	}
 
 	objID, err := primitive.ObjectIDFromHex(string(data["id"]))
 	if err != nil {
@@ -72,12 +84,12 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	/*subClaim, err := getClaim(r, "sub")
+	subClaim, err := getClaim(r, "sub")
 	if err != nil {
 		logging.AuthError(w, err, "getClaim (sub)")
 		return
-	}*/
-	subClaim := "Grisha"
+	}
+
 	desc := r.FormValue("fileDescription")
 
 	gridFSOptions := options.GridFSUpload()
@@ -99,6 +111,21 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Infof("Write file to DB was successful. File size: %dM\n", fileSize)
 	w.Write([]byte("Successfully uploaded file!"))
+
+	/*objID, err := primitive.ObjectIDFromHex(fmt.Sprintf("%v", uploadStream.FileID))
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	filter := bson.M{"_id" : objID}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = collection.FindOne(ctx, filter).Decode(&file)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	json.NewEncoder(w).Encode(file)*/
 }
 
 
@@ -200,4 +227,27 @@ func getFilesListForUser(w http.ResponseWriter, r *http.Request) {
 		).Fatal("DB interaction resulted in error, shutting down...")
 	}
 	json.NewEncoder(w).Encode(files)
+}
+
+func getFile(w http.ResponseWriter, r *http.Request) {
+	var file models.File
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	data := mux.Vars(r)
+
+	objID, err := primitive.ObjectIDFromHex(string(data["id"]))
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	filter := bson.M{"_id" : objID}
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = collection.FindOne(ctx, filter).Decode(&file)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	json.NewEncoder(w).Encode(file)
 }

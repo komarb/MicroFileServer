@@ -76,6 +76,7 @@ func (a *App) setRouters() {
 	a.Router.HandleFunc("/download/{id}", downloadFile).Methods("GET")
 	a.Router.HandleFunc("/upload", uploadFile).Methods("POST")
 	a.Router.HandleFunc("/files/{id}", deleteFile).Methods("DELETE")
+	a.Router.HandleFunc("/files/{id}", getFile).Methods("GET")
 	a.Router.HandleFunc("/files", getFilesListForUser).Methods("GET").Queries("user","{user}")
 	a.Router.HandleFunc("/files", getFilesList).Methods("GET")
 
