@@ -1,15 +1,17 @@
-children:
-  - Assertions
+children: []
 variables: {}
 type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: POST
-    url: '${$env.baseURL}/upload'
+    method: GET
+    url: '${$env.baseURL}/files?user=Anton'
   headers: []
   disabledInheritedHeaders: []
-  params: []
+  params:
+    - name: user
+      value: Anton
+      isChecked: true
   body:
     type: Json
     jsonBody: ''
@@ -19,6 +21,7 @@ requestData:
     file: ''
     formURLEncoded: []
   strictSSL: Inherit
+  followRedirect: Inherit
 authData:
   type: inherit
-name: UploadFile
+name: GetFilesListForUser
