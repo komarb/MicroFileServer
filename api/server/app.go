@@ -68,11 +68,11 @@ func (a *App) Init(config *config.Config) {
 }
 
 func (a *App) setRouters() {
-	/*if cfg.App.TestMode {
+	if cfg.App.TestMode {
 		a.Router.Use(testAuthMiddleware)
 	} else {
 		a.Router.Use(authMiddleware)
-	}*/
+	}
 	a.Router.HandleFunc("/download/{id}", downloadFile).Methods("GET")
 	a.Router.HandleFunc("/upload", uploadFile).Methods("POST")
 	a.Router.HandleFunc("/files/{id}", deleteFile).Methods("DELETE")

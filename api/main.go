@@ -13,3 +13,4 @@ func main() {
 	app.Run(":"+cfg.App.AppPort)
 	fmt.Scanln()
 }
+
