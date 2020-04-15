@@ -3,6 +3,8 @@ package server
 import (
 	"MicroFileServer/logging"
 	"MicroFileServer/models"
+	"errors"
+	"fmt"
 	"github.com/auth0-community/go-auth0"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/square/go-jose.v2"
@@ -31,7 +33,7 @@ func authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		Claims = models.Claims{}
+		Claims.ITLab = nil
 		err = getClaims(r)
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -65,7 +67,6 @@ func authMiddleware(next http.Handler) http.Handler {
 			w.Write([]byte("Wrong itlab claim!"))
 			return
 		}
-
 		sw := logging.NewStatusWriter(w)
 		next.ServeHTTP(sw, r)
 		logging.LogHandler(sw, r)
@@ -90,7 +91,12 @@ func testAuthMiddleware(next http.Handler) http.Handler {
 			w.Write([]byte(err.Error()))
 			return
 		}
+		Claims.ITLab = nil
 		getClaims(r)
+
+		fmt.Println(Claims.ITLab)
+		fmt.Println(Claims.Sub)
+
 		sw := logging.NewStatusWriter(w)
 		next.ServeHTTP(sw, r)
 		logging.LogHandler(sw, r)
@@ -112,6 +118,22 @@ func getClaims(r *http.Request) error {
 		return err
 	}
 	err = validator.Claims(r, token, &Claims)
+
+	switch Claims.ITLabInterface.(type) {
+	case string:
+		claimString := Claims.ITLabInterface.(string)
+		Claims.ITLab = []string{claimString}
+	case []interface{}:
+		claimInterface, ok := Claims.ITLabInterface.([]interface{})
+		claimString := make([]string, len(claimInterface))
+		for i, v := range claimInterface {
+			claimString[i], ok = v.(string)
+			if !ok { return errors.New("itLab claim is invalid") }
+		}
+		if ok { Claims.ITLab = claimString }
+	default:
+		return errors.New("itLab claim is invalid")
+	}
 	return nil
 }
 
@@ -126,7 +148,7 @@ func isUser() bool {
 
 func isAdmin() bool {
 	for _, elem := range Claims.ITLab {
-		if elem == "reports.admin" {
+		if elem == "mfs.admin" {
 			return true
 		}
 	}

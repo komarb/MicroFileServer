@@ -175,10 +175,20 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 
 func getFilesList(w http.ResponseWriter, r *http.Request) {
 	files := make([]models.File, 0)
+	var filter bson.M
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	cur, err := collection.Find(ctx, bson.M{})
+	switch {
+	case isAdmin():
+		filter = bson.M{}
+	case isUser():
+		filter = bson.M{
+			"metadata.fileSender": Claims.Sub,
+		}
+	}
+	cur, err := collection.Find(ctx, filter)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"function" : "mongo.Find",
@@ -263,10 +273,5 @@ func getFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if file.Metadata.FileSender == Claims.Sub || isAdmin() {
-		json.NewEncoder(w).Encode(file)
-	} else {
-		w.WriteHeader(403)
-		return
-	}
+	json.NewEncoder(w).Encode(file)
 }
