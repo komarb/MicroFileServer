@@ -47,17 +47,6 @@ func authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if !checkScope(cfg.Auth.Scope) {
-			log.WithFields(log.Fields{
-				"requiredScope" : cfg.Auth.Scope,
-				"error" : err,
-			}).Warning("Invalid scope!")
-
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Invalid scope"))
-			return
-		}
-
 		if !isUser() {
 			log.WithFields(log.Fields{
 				"Claims.ITLab" : Claims.ITLab,
@@ -101,15 +90,6 @@ func testAuthMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(sw, r)
 		logging.LogHandler(sw, r)
 	})
-}
-
-func checkScope(scope string) bool {
-	for _, elem := range Claims.Scope {
-		if elem == scope {
-			return true
-		}
-	}
-	return false
 }
 
 func getClaims(r *http.Request) error {
