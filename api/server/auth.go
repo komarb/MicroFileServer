@@ -4,7 +4,6 @@ import (
 	"MicroFileServer/logging"
 	"MicroFileServer/models"
 	"errors"
-	"fmt"
 	"github.com/auth0-community/go-auth0"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/square/go-jose.v2"
@@ -12,6 +11,14 @@ import (
 )
 var validator *auth0.JWTValidator
 var Claims	models.Claims
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sw := logging.NewStatusWriter(w)
+		next.ServeHTTP(sw, r)
+		logging.LogHandler(sw, r)
+	})
+}
 
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +39,6 @@ func authMiddleware(next http.Handler) http.Handler {
 			w.Write([]byte(err.Error()))
 			return
 		}
-
 		Claims.ITLab = nil
 		err = getClaims(r)
 		if err != nil {
@@ -83,14 +89,16 @@ func testAuthMiddleware(next http.Handler) http.Handler {
 		Claims.ITLab = nil
 		getClaims(r)
 
-		fmt.Println(Claims.ITLab)
-		fmt.Println(Claims.Sub)
+		log.Info(Claims.ITLab)
+		log.Info(Claims.Sub)
 
 		sw := logging.NewStatusWriter(w)
 		next.ServeHTTP(sw, r)
 		logging.LogHandler(sw, r)
 	})
 }
+
+
 
 func getClaims(r *http.Request) error {
 	token, err := validator.ValidateRequest(r)
