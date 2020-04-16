@@ -2,11 +2,15 @@ version: '3.7'
 services:
   api:
     build: './api'
+    environment:
+      - TZ=Europe/Moscow
     ports:
       - '8080:8080'
     depends_on:
       - 'db'
   db:
+    environment:
+      - TZ=Europe/Moscow
     image: 'mongo:latest'
     ports:
       - '27100:27017'
