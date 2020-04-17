@@ -108,7 +108,6 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		).Warn("Can't open upload stream!")
 		return
 	}
-	defer uploadStream.Close()
 
 	fileSize, err := uploadStream.Write(fileBytes)
 	if err != nil {
@@ -124,7 +123,19 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		"fileSize" : fileSize,
 	},
 	).Info("Write file to DB was successful. File size: ")
-	w.Write([]byte("Successfully uploaded file!"))
+
+	fileID := uploadStream.FileID
+	uploadStream.Close()
+	var file models.File
+	filter := bson.M{"_id" : fileID}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = collection.FindOne(ctx, filter).Decode(&file)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	json.NewEncoder(w).Encode(file)
 }
 
 func deleteFile(w http.ResponseWriter, r *http.Request) {
