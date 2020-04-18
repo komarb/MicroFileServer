@@ -82,7 +82,7 @@ func (a *App) setRouters() {
 	private.HandleFunc("/{id}", deleteFile).Methods("DELETE")
 	private.HandleFunc("/{id}", getFile).Methods("GET")
 	private.HandleFunc("", getFilesListForUser).Methods("GET").Queries("user","{user}")
-	private.HandleFunc("", getFilesList).Methods("GET")
+	private.HandleFunc("", getFilesList).Methods("GET").Queries("sorted_by", "{sortVar}")
 }
 
 func (a *App) Run(addr string) {

@@ -18,8 +18,6 @@ import (
 	"time"
 )
 
-
-
 func downloadFile(w http.ResponseWriter, r *http.Request) {
 	var downloadedFile models.File
 
@@ -30,7 +28,6 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filter := bson.M{"_id": objID}
-
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err = collection.FindOne(ctx, filter).Decode(&downloadedFile)
 	if err != nil {
@@ -66,11 +63,12 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 30 * 1024 * 1024)
 	data, handler, err := r.FormFile("uploadingForm")
 	if err != nil {
-		w.Write([]byte("File is too big! (Max size: 30MB)"))
+		w.Write([]byte("File is not appropriate! (max. 30MB)"))
+		w.WriteHeader(400)
 		log.WithFields(log.Fields{
 			"err" : err,
 		},
-		).Info("File is too big! (Max size: 30MB)")
+		).Info("File is not appropriate! (max. 30MB)")
 		return
 	}
 	defer data.Close()
@@ -148,7 +146,6 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	filter := bson.M{"_id": objID}
-
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err = collection.FindOne(ctx, filter).Decode(&requiredFile)
 	if err != nil {
@@ -176,8 +173,8 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 			},
 			).Fatal("DB interaction resulted in error, shutting down...")
 		}
-		w.WriteHeader(200)
 		w.Write([]byte("Successfully deleted file!"))
+		w.WriteHeader(200)
 	} else {
 		w.WriteHeader(403)
 		return
@@ -190,7 +187,6 @@ func getFilesList(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	switch {
 	case isAdmin():
 		filter = bson.M{}
@@ -199,7 +195,17 @@ func getFilesList(w http.ResponseWriter, r *http.Request) {
 			"metadata.fileSender": Claims.Sub,
 		}
 	}
-	cur, err := collection.Find(ctx, filter)
+	data := mux.Vars(r)
+	sortVar := data["var"]
+	findOptions := options.Find()
+	switch sortVar {
+	case "name":
+		findOptions.SetSort(bson.M{"metadata.fileSender": 1})
+	case "date":
+		findOptions.SetSort(bson.M{"uploadDate": 1})
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	cur, err := collection.Find(ctx, filter, findOptions)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"function" : "mongo.Find",
@@ -234,8 +240,10 @@ func getFilesListForUser(w http.ResponseWriter, r *http.Request) {
 		filter := bson.M{
 			"metadata.fileSender" : user,
 		}
+		findOptions := options.Find()
+		findOptions.SetSort(bson.M{"uploadDate": 1})
 		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-		cur, err := collection.Find(ctx, filter)
+		cur, err := collection.Find(ctx, filter, findOptions)
 		if err != nil {
 			log.WithFields(log.Fields{
 				"function" : "mongo.Find",
@@ -274,9 +282,7 @@ func getFile(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
 	filter := bson.M{"_id" : objID}
-
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err = collection.FindOne(ctx, filter).Decode(&file)
 	if err != nil {
