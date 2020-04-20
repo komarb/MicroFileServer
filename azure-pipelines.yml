@@ -33,9 +33,9 @@ stages:
         targetPath: '$(Build.ArtifactStagingDirectory)'
         artifact: 'microfileserver-api-build'
         publishLocation: 'pipeline'
-    # - task: PublishPipelineArtifact@1
-    #   displayName: 'Publish deploy artifact'
-    #   inputs:
-    #     targetPath: 'deploy'
-    #     artifact: 'itlab-reports-deploy'
-    #     publishLocation: 'pipeline'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish deploy artifact'
+      inputs:
+        targetPath: 'deploy'
+        artifact: 'microfileserver-api-deploy'
+        publishLocation: 'pipeline'
