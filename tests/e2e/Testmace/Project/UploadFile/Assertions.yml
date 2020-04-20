@@ -1,0 +1,26 @@
+children: []
+variables: {}
+type: Assertion
+assertions:
+  - disabled: false
+    negative: false
+    type: compare
+    actualValue: '${$response.body}'
+    operator: equal
+    expectedValueType: string
+    expectedValue: '200'
+  - disabled: false
+    negative: false
+    type: script
+    script: ''
+    name: Upload File
+  - disabled: false
+    negative: false
+    type: script
+    script: >
+      console.log(tm.currentNode.parent.vars.checkCount)
+
+      assert(Array.isArray(tm.currentNode.parent.response.body), 'Body must be
+      an array')
+    name: Body must be an array
+name: Assertions

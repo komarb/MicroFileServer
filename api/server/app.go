@@ -68,14 +68,21 @@ func (a *App) Init(config *config.Config) {
 }
 
 func (a *App) setRouters() {
-	/*if cfg.App.TestMode {
-		a.Router.Use(testAuthMiddleware)
+	public := a.Router.PathPrefix("/download").Subrouter()
+	public.Use(loggingMiddleware)
+	public.HandleFunc("/{id}", downloadFile).Methods("GET")
+
+	private := a.Router.PathPrefix("/files").Subrouter()
+	if cfg.App.TestMode {
+		private.Use(testAuthMiddleware)
 	} else {
-		a.Router.Use(authMiddleware)
-	}*/
-	a.Router.HandleFunc("/files/{id}", downloadFile).Methods("GET")
-	a.Router.HandleFunc("/upload", uploadFile).Methods("POST")
-	a.Router.HandleFunc("/files/{id}", deleteFile).Methods("DELETE")
+		private.Use(authMiddleware)
+	}
+	private.HandleFunc("/upload", uploadFile).Methods("POST")
+	private.HandleFunc("/{id}", deleteFile).Methods("DELETE")
+	private.HandleFunc("/{id}", getFile).Methods("GET")
+	private.HandleFunc("", getFilesListForUser).Methods("GET").Queries("user","{user}")
+	private.HandleFunc("", getFilesList).Methods("GET").Queries("sorted_by", "{sortVar}")
 }
 
 func (a *App) Run(addr string) {

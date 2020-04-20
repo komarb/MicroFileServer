@@ -1,12 +1,11 @@
-children:
-  - Assertions
+children: []
 variables: {}
 type: RequestStep
 assignVariables: []
 requestData:
   request:
-    method: POST
-    url: '${$env.baseURL}/upload'
+    method: GET
+    url: '${$env.baseURL}/files'
   headers: []
   disabledInheritedHeaders: []
   params: []
@@ -19,6 +18,7 @@ requestData:
     file: ''
     formURLEncoded: []
   strictSSL: Inherit
+  followRedirect: Inherit
 authData:
   type: inherit
-name: UploadFile
+name: GetFilesList

@@ -27,8 +27,7 @@ File ```auth_config.json``` must contain next content:
   "AuthOptions": {
     "keyUrl": "https://examplesite/files/jwks.json", //url to jwks.json
     "audience": "example_audience", //audince for JWT
-    "issuer" : "https://exampleissuersite.com", //issuer for JWT
-    "scope" : "my_scope" //required scope for JWT
+    "issuer" : "https://exampleissuersite.com" //issuer for JWT
   }
 }
 

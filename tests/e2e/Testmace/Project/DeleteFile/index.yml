@@ -6,7 +6,10 @@ requestData:
   request:
     method: DELETE
     url: '${$env.baseURL}/files/5e824b6dd3468776ad95b04d'
-  headers: []
+  headers:
+    - isChecked: true
+      name: Authorization
+      value: 'Bearer ${$env.testJWT}'
   disabledInheritedHeaders: []
   params: []
   body:

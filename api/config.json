@@ -2,11 +2,11 @@
   "DbOptions": {
     "host": "localhost",
     "dbPort": "27017",
-    "dbName" : "MyFileServer",
+    "dbName" : "MicroFileServer",
     "collectionName" : "fs.files"
   },
   "AppOptions": {
     "appPort": "8080",
-    "testMode": true
+    "testMode": false
   }
 }
