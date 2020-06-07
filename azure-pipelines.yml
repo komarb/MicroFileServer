@@ -1,0 +1,41 @@
+name: $(BuildID)-$(Build.SourceBranchName)
+
+trigger:
+- master
+- develop
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+  CGO_ENABLED: 0
+  GOOS: linux
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Go@0
+      displayName: build
+      inputs:
+        command: 'build'
+        arguments: '-a -installsuffix cgo -o $(Build.ArtifactStagingDirectory)/main -v'
+        workingDirectory: 'api'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish build artifact'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'microfileserver-api-build'
+        publishLocation: 'pipeline'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish deploy artifact'
+      inputs:
+        targetPath: 'deploy'
+        artifact: 'microfileserver-api-deploy'
+        publishLocation: 'pipeline'
