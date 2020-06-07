@@ -35,7 +35,6 @@ func (a *App) Init(config *config.Config) {
 		).Fatal("Failed to create new MongoDB client")
 	}
 
-	// Create db connect
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err = client.Connect(ctx)
 	if err != nil {
@@ -45,7 +44,6 @@ func (a *App) Init(config *config.Config) {
 		).Fatal("Failed to connect to MongoDB")
 	}
 
-	// Check the connection
 	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
 	err = client.Ping(ctx, nil)
 	if err != nil {
@@ -72,17 +70,18 @@ func (a *App) setRouters() {
 	public.Use(loggingMiddleware)
 	public.HandleFunc("/{id}", downloadFile).Methods("GET")
 
+
 	private := a.Router.PathPrefix("/files").Subrouter()
 	if cfg.App.TestMode {
 		private.Use(testAuthMiddleware)
 	} else {
 		private.Use(authMiddleware)
 	}
-	private.HandleFunc("/upload", uploadFile).Methods("POST")
-	private.HandleFunc("/{id}", deleteFile).Methods("DELETE")
-	private.HandleFunc("/{id}", getFile).Methods("GET")
-	private.HandleFunc("", getFilesListForUser).Methods("GET").Queries("user","{user}")
-	private.HandleFunc("", getFilesList).Methods("GET").Queries("sorted_by", "{sortVar}")
+	private.HandleFunc("/upload", uploadFile).Methods("POST", "OPTIONS")
+	private.HandleFunc("/{id}", deleteFile).Methods("DELETE", "OPTIONS")
+	private.HandleFunc("/{id}", getFile).Methods("GET", "OPTIONS")
+	private.HandleFunc("", getFilesListForUser).Methods("GET", "OPTIONS").Queries("user","{user}")
+	private.HandleFunc("", getFilesList).Methods("GET", "OPTIONS").Queries("sorted_by", "{sortVar}")
 }
 
 func (a *App) Run(addr string) {

@@ -7,6 +7,6 @@
   },
   "AppOptions": {
     "appPort": "8080",
-    "testMode": false
+    "testMode": true
   }
 }

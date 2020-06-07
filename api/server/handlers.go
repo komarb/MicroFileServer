@@ -11,10 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"io"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -22,7 +20,7 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 	var downloadedFile models.File
 
 	data := mux.Vars(r)
-	objID, err := primitive.ObjectIDFromHex(string(data["id"]))
+	objID, err := primitive.ObjectIDFromHex(data["id"])
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -51,10 +49,8 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 		"fileSize" : dStream,
 	},
 	).Info("File size to download: ")
+	http.ServeContent(w, r, fileName, time.Now(), bytes.NewReader(buf.Bytes()))
 
-	w.Header().Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
-	w.Header().Set("Content-Length", strconv.FormatInt(downloadedFile.Length, 10))
-	io.Copy(w, buf)
 }
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
@@ -140,7 +136,7 @@ func deleteFile(w http.ResponseWriter, r *http.Request) {
 	var requiredFile models.File
 	data := mux.Vars(r)
 
-	objID, err := primitive.ObjectIDFromHex(string(data["id"]))
+	objID, err := primitive.ObjectIDFromHex(data["id"])
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -277,7 +273,7 @@ func getFile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	data := mux.Vars(r)
-	objID, err := primitive.ObjectIDFromHex(string(data["id"]))
+	objID, err := primitive.ObjectIDFromHex(data["id"])
 	if err != nil {
 		http.NotFound(w, r)
 		return
