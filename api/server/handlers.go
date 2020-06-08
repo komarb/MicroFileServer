@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,6 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -49,22 +51,28 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 		"fileSize" : dStream,
 	},
 	).Info("File size to download: ")
+
+	mime := mimetype.Detect(buf.Bytes())
+	if !strings.Contains(mime.String(), "video") && !strings.Contains(mime.String(), "audio") {
+		w.Header().Set("Content-Type", mime.String())
+		w.Header().Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
+	}
 	http.ServeContent(w, r, fileName, time.Now(), bytes.NewReader(buf.Bytes()))
 
 }
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	r.Body = http.MaxBytesReader(w, r.Body, 30 * 1024 * 1024)
+	r.Body = http.MaxBytesReader(w, r.Body, cfg.App.MaxFileSize * 1024 * 1024)
 	data, handler, err := r.FormFile("uploadingForm")
 	if err != nil {
-		w.Write([]byte("File is not appropriate! (max. 30MB)"))
+		w.Write([]byte("File is not appropriate!"))
 		w.WriteHeader(400)
 		log.WithFields(log.Fields{
 			"err" : err,
+			"maxSizeInMB" : cfg.App.MaxFileSize,
 		},
-		).Info("File is not appropriate! (max. 30MB)")
+		).Info("File is not appropriate!")
 		return
 	}
 	defer data.Close()

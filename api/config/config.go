@@ -27,6 +27,7 @@ type AuthConfig struct {
 type AppConfig struct {
 	AppPort		string	`json:"appPort"`
 	TestMode	bool	`json:"testMode"`
+	MaxFileSize int64		`json:"maxFileSize"`
 }
 
 func GetConfig() *Config {
