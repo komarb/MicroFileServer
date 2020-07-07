@@ -34,7 +34,6 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
 	fileName := downloadedFile.FileName
 	buf := bytes.NewBuffer(nil)
 	bucket, _ := gridfs.NewBucket(db)
@@ -58,7 +57,6 @@ func downloadFile(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
 	}
 	http.ServeContent(w, r, fileName, time.Now(), bytes.NewReader(buf.Bytes()))
-
 }
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
