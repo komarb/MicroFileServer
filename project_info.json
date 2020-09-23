@@ -9,7 +9,7 @@
     "path": "MicroFileServer",
     "humanName": "Файловый сервер для прикрепления документов к отчетам ITLab-Reports",
     "description": "MicroFileServer позволяет добавлять в отчеты сотрудников дополнительные файлы",
-    "stackTags": [
+    "labels": [
       {
         "name" : "Backend",
         "type" : "direction"
