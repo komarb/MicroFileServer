@@ -9,18 +9,27 @@
     "path": "MicroFileServer",
     "humanName": "Файловый сервер для прикрепления документов к отчетам ITLab-Reports",
     "description": "MicroFileServer позволяет добавлять в отчеты сотрудников дополнительные файлы",
-    "stackTags":{
-      "directions":[
-        "Backend"
-      ],
-      "databases":[
-        "MongoDB"
-      ],
-      "frameworks":[
-        "Gorilla",
-        "Logrus",
-        "GridFS"
-      ]
-    }
+    "stackTags": [
+      {
+        "name" : "Backend",
+        "type" : "direction"
+      },
+      {
+        "name" : "MongoDB",
+        "type" : "database"
+      },
+      {
+        "name" : "Gorilla",
+        "type" : "framework"
+      },
+      {
+        "name" : "Logrus",
+        "type" : "framework"
+      },
+      {
+        "name" : "GridFS",
+        "type" : "framework"
+      }
+    ]
   }
 }
