@@ -2,32 +2,32 @@ package config
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
+
+	"github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {
-	DB *DBConfig	`json:"DbOptions"`
-	Auth *AuthConfig	`json:"AuthOptions"`
-	App *AppConfig		`json:"AppOptions"`
+	DB   *DBConfig   `json:"DbOptions"`
+	Auth *AuthConfig `json:"AuthOptions"`
+	App  *AppConfig  `json:"AppOptions"`
 }
 
 type DBConfig struct {
-	Host 		string		`json:"host"`
-	DBPort 		string		`json:"dbPort"`
-	DBName 		string		`json:"dbName"`
-	CollectionName 	string 	`json:"collectionName"`
+	Host           string `envconfig:"MFS_MONGO_HOST",json:"host"`
+	DBPort         string `envconfig:"MFS_MONGO_PORT",json:"dbPort"`
+	DBName         string `envconfig:"MFS_MONGO_DB_NAME",json:"dbName"`
+	CollectionName string `envconfig:"MFS_MONGO_DB_COLLECTION_NAME",json:"collectionName"`
 }
 type AuthConfig struct {
-	KeyURL		string		`json:"keyUrl"`
-	Audience	string		`json:"audience"`
-	Issuer		string		`json:"issuer"`
-	Scope		string		`json:"scope"`
+	KeyURL   string `envconfig:"MFS_AUTH_KEY_URL",json:"keyUrl"`
+	Audience string `envconfig:"MFS_AUTH_AUDIENCE",json:"audience"`
+	Issuer   string `envconfig:"MFS_AUTH_ISSUER",json:"issuer"`
+	Scope    string `envconfig:"MFS_AUTH_SCOPE",json:"scope"`
 }
 type AppConfig struct {
-	AppPort		string	`json:"appPort"`
-	TestMode	bool	`json:"testMode"`
-	MaxFileSize int64		`json:"maxFileSize"`
+	AppPort  string `envconfig:"MFS_APP_PORT",json:"appPort"`
 }
 
 func GetConfig() *Config {
@@ -35,16 +35,16 @@ func GetConfig() *Config {
 	data, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		log.WithFields(log.Fields{
-			"function" : "GetConfig.ReadFile",
-			"error"	:	err,
+			"function": "GetConfig.ReadFile",
+			"error":    err,
 		},
 		).Fatal("Can't read config.json file, shutting down...")
 	}
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"function" : "GetConfig.Unmarshal",
-			"error"	:	err,
+			"function": "GetConfig.Unmarshal",
+			"error":    err,
 		},
 		).Fatal("Can't correctly parse json from config.json, shutting down...")
 	}
@@ -52,18 +52,28 @@ func GetConfig() *Config {
 	data, err = ioutil.ReadFile("auth_config.json")
 	if err != nil {
 		log.WithFields(log.Fields{
-			"function" : "GetConfig.ReadFile",
-			"error"	:	err,
+			"function": "GetConfig.ReadFile",
+			"error":    err,
 		},
-		).Fatal("Can't read auth_config.json file, shutting down...")
+		).Warning("Can't read auth_config.json file, shutting down...")
 	}
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"function" : "GetConfig.Unmarshal",
-			"error"	:	err,
+			"function": "GetConfig.Unmarshal",
+			"error":    err,
 		},
-		).Fatal("Can't correctly parse json from auth_config.json, shutting down...")
+		).Warning("Can't correctly parse json from auth_config.json, shutting down...")
 	}
+
+	err = envconfig.Process("mfs", &config)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"function": "envconfig.Process",
+			"error":    err,
+		},
+		).Fatal("Can't read env vars, shutting down...")
+	}
+
 	return &config
 }
