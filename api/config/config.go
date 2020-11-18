@@ -24,7 +24,6 @@ type AuthConfig struct {
 	KeyURL   string `envconfig:"MFS_AUTH_KEY_URL",json:"keyUrl"`
 	Audience string `envconfig:"MFS_AUTH_AUDIENCE",json:"audience"`
 	Issuer   string `envconfig:"MFS_AUTH_ISSUER",json:"issuer"`
-	Scope    string `envconfig:"MFS_AUTH_SCOPE",json:"scope"`
 }
 type AppConfig struct {
 	AppPort  string `envconfig:"MFS_APP_PORT",json:"appPort"`
@@ -41,7 +40,7 @@ func GetConfig() *Config {
 			"function": "GetConfig.ReadFile",
 			"error":    err,
 		},
-		).Fatal("Can't read config.json file, shutting down...")
+		).Warn("Can't read config.json file, shutting down...")
 	}
 	err = json.Unmarshal(data, &config)
 	if err != nil {
@@ -49,7 +48,7 @@ func GetConfig() *Config {
 			"function": "GetConfig.Unmarshal",
 			"error":    err,
 		},
-		).Fatal("Can't correctly parse json from config.json, shutting down...")
+		).Warn("Can't correctly parse json from config.json, shutting down...")
 	}
 
 	data, err = ioutil.ReadFile("auth_config.json")
@@ -58,7 +57,7 @@ func GetConfig() *Config {
 			"function": "GetConfig.ReadFile",
 			"error":    err,
 		},
-		).Warning("Can't read auth_config.json file, shutting down...")
+		).Warn("Can't read auth_config.json file, shutting down...")
 	}
 	err = json.Unmarshal(data, &config)
 	if err != nil {
