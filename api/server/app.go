@@ -61,7 +61,7 @@ func (a *App) Init(config *config.Config) {
 
 	collection = client.Database(cfg.DB.DBName).Collection(cfg.DB.CollectionName)
 	db = client.Database(cfg.DB.DBName)
-	a.Router = mux.NewRouter()
+	a.Router = mux.NewRouter().PathPrefix(cfg.App.PathPrefix).Subrouter()
 	a.setRouters()
 }
 

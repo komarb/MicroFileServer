@@ -8,6 +8,7 @@
   "AppOptions": {
     "appPort": "8080",
     "testMode": true,
-    "maxFileSize": 100
+    "maxFileSize": 100,
+    "pathPrefix": "/1/2"
   }
 }
