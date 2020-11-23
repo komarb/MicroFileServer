@@ -9,9 +9,7 @@ File ```config.json``` must contain next content:
 ```js
 {
   "DbOptions": {
-    "uri": "mongodb://user:password@localhost:27017", //uri connection string | env: MFS_MONGO_URI
-    "dbname": "db", //name of db in mongodb | env: MFS_MONGO_DB_NAME
-    "collectionName": "collection" //name of collection in mongodb | env: MFS_MONGO_DB_COLLECTION_NAME
+    "uri": "mongodb://user:password@localhost:27017/MicroFileServer", //uri connection string | env: MFS_MONGO_URI
   },
   "AppOptions": {
     "testMode": true|false, //bool option for enabling Tests mode | env: MFS_TEST_MODE

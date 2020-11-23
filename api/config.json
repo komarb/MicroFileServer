@@ -1,13 +1,11 @@
 {
   "DbOptions": {
-    "uri": "mongodb://localhost:27017",
-    "dbName" : "MicroFileServer",
-    "collectionName" : "fs.files"
+    "uri": "mongodb://localhost:27017/MicroFileServer"
   },
   "AppOptions": {
     "appPort": "8080",
     "testMode": true,
     "maxFileSize": 100,
-    "pathPrefix": "/1/2"
+    "pathPrefix": "/mfs"
   }
 }
