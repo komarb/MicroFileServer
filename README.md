@@ -9,8 +9,7 @@ File ```config.json``` must contain next content:
 ```js
 {
   "DbOptions": {
-    "host": "mongo", //host to mongodb server | env: MFS_MONGO_HOST
-    "port": "27017", //port to mongodb server | env: MFS_MONGO_PORT
+    "uri": "mongodb://user:password@localhost:27017", //uri connection string | env: MFS_MONGO_URI
     "dbname": "db", //name of db in mongodb | env: MFS_MONGO_DB_NAME
     "collectionName": "collection" //name of collection in mongodb | env: MFS_MONGO_DB_COLLECTION_NAME
   },

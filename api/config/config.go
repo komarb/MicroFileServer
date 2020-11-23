@@ -15,8 +15,7 @@ type Config struct {
 }
 
 type DBConfig struct {
-	Host           string `envconfig:"MFS_MONGO_HOST",json:"host"`
-	DBPort         string `envconfig:"MFS_MONGO_PORT",json:"dbPort"`
+	URI           string `envconfig:"MFS_MONGO_URI",json:"uri"`
 	DBName         string `envconfig:"MFS_MONGO_DB_NAME",json:"dbName"`
 	CollectionName string `envconfig:"MFS_MONGO_DB_COLLECTION_NAME",json:"collectionName"`
 }

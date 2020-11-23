@@ -22,15 +22,14 @@ var cfg *config.Config
 
 func (a *App) Init(config *config.Config) {
 	cfg = config
-	log.Info("Little Big File Server is starting up!")
-	DBUri := "mongodb://" + cfg.DB.Host + ":" + cfg.DB.DBPort
-	log.WithField("dburi", DBUri).Info("Current database URI: ")
-	client, err := mongo.NewClient(options.Client().ApplyURI(DBUri))
+	log.Info("Micro File Server is starting up!")
+	log.WithField("dburi", cfg.DB.URI).Info("Current database URI: ")
+	client, err := mongo.NewClient(options.Client().ApplyURI(cfg.DB.URI))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"function" : "mongo.NewClient",
 			"error"	:	err,
-			"db_uri":	DBUri,
+			"db_uri":	cfg.DB.URI,
 		},
 		).Fatal("Failed to create new MongoDB client")
 	}
